@@ -1,10 +1,27 @@
 [project]
 name = "porkbun-domain-mcp"
 version = "0.1.1"
-description = "Add your description here"
+description = "MCP server for Porkbun domain management"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fastmcp>=2.12.3",
+    "mcp-common>=0.4.8",
+    "oneiric>=0.3.6",
+    "httpx>=0.28.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.0.0",
+    "rich>=13.0.0",
+    "typer>=0.15.0",
+]
+
+[project.scripts]
+porkbun-domain-mcp = "porkbun_domain_mcp.cli:main"
+
+[tool.porkbun-domain-mcp]
+http_port = 3043
+http_host = "127.0.0.1"
+enable_http_transport = false
 
 [dependency-groups]
 dev = [
