@@ -1,0 +1,23 @@
+# Porkbun Domain MCP Server Configuration
+# Oneiric-style layered configuration
+#
+# Override with:
+#   - settings/local.yaml (gitignored, for development)
+#   - Environment variables: PORKBUN_DOMAIN_{FIELD}
+
+server_name: "porkbun-domain-mcp"
+server_description: "MCP server for Porkbun domain management"
+
+# API Configuration
+base_url: "https://porkbun.com/api/json/v3"
+timeout: 30.0
+max_retries: 3
+
+# HTTP Transport (enabled by default)
+enable_http_transport: true
+http_host: "127.0.0.1"
+http_port: 3043
+
+# Logging (Oneiric style)
+log_level: "INFO"
+log_json: true
