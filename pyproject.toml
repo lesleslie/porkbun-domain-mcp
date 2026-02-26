@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "porkbun-domain-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Unofficial MCP server for Porkbun domain management"
 readme = "README.md"
 requires-python = ">=3.13"
