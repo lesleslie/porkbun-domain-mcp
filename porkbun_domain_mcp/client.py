@@ -41,7 +41,7 @@ class PorkbunDomainClient:
         self.settings = settings or get_settings()
         self._client: httpx.AsyncClient | None = None
 
-    async def __aenter__(self) -> "PorkbunDomainClient":
+    async def __aenter__(self) -> PorkbunDomainClient:
         """Async context manager entry."""
         await self._ensure_client()
         return self

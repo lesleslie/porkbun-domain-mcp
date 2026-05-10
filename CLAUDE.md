@@ -1,4 +1,10 @@
-# porkbun-domain-mcp
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+For a shorter, tool-neutral bootstrap document, start with `AGENTS.md`.
+
+## Project Overview
 
 MCP server for Porkbun domain management.
 
@@ -9,6 +15,7 @@ MCP server for Porkbun domain management.
 This project uses Crackerjack for quality assurance. Follow these patterns:
 
 **Type Hints:**
+
 ```python
 from typing import Any
 
@@ -25,6 +32,7 @@ def process_domain(domain: str) -> dict[str, Any]:
 ```
 
 **Error Handling:**
+
 ```python
 # DO - Specific exception handling
 try:
@@ -41,6 +49,7 @@ except Exception:
 ```
 
 **Docstrings:**
+
 - Use Google-style docstrings
 - Include Args, Returns, Raises sections
 - Document non-obvious behavior
@@ -71,6 +80,7 @@ creosote
 ```
 
 <!-- CRACKERJACK_START -->
+
 ## Crackerjack Integration
 
 This project is integrated with Crackerjack for automated quality assurance:
@@ -82,6 +92,7 @@ This project is integrated with Crackerjack for automated quality assurance:
 ### Available Skills
 
 The project can use Crackerjack's AI agent skills via MCP:
+
 - `RefactoringAgent` - Code refactoring and cleanup
 - `PerformanceAgent` - Performance optimization
 - `SecurityAgent` - Security vulnerability analysis
@@ -98,4 +109,5 @@ The project can use Crackerjack's AI agent skills via MCP:
 ### MCP Integration
 
 This project can be accessed via Crackerjack's MCP server for real-time quality monitoring and intelligent fix suggestions.
+
 <!-- CRACKERJACK_END -->

@@ -8,14 +8,13 @@ API Documentation: https://porkbun.com/api/json/v3/documentation
 
 from __future__ import annotations
 
-from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 
-class DomainStatus(str, Enum):
+class DomainStatus(StrEnum):
     """Domain status values."""
 
     ACTIVE = "ACTIVE"
@@ -24,7 +23,7 @@ class DomainStatus(str, Enum):
     WHOIS_PENDING = "WHOIS PENDING"
 
 
-class WhoisPrivacy(str, Enum):
+class WhoisPrivacy(StrEnum):
     """WHOIS privacy status."""
 
     ENABLED = "ENABLED"

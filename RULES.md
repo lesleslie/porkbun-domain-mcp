@@ -20,11 +20,13 @@ def process(item: dict[str, Any]) -> str:
 ## Error Handling
 
 **DO:**
+
 - Catch specific exceptions
 - Log errors with context
 - Clean up resources in finally blocks
 
 **DON'T:**
+
 - Use bare `except:` clauses
 - Suppress exceptions with `pass`
 - Use `# TODO` comments in production code

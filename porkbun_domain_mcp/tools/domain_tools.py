@@ -69,7 +69,7 @@ def _pricing_to_dict(pricing: PricingInfo) -> dict[str, Any]:
     }
 
 
-def register_domain_tools(app: "FastMCP", client: PorkbunDomainClient) -> None:
+def register_domain_tools(app: FastMCP, client: PorkbunDomainClient) -> None:
     """Register domain management tools with the FastMCP app."""
 
     @app.tool()
@@ -257,8 +257,7 @@ def register_domain_tools(app: "FastMCP", client: PorkbunDomainClient) -> None:
             pricing = await client.get_pricing(tld)
 
             pricing_list = [
-                {"tld": t, **_pricing_to_dict(p)}
-                for t, p in pricing.items()
+                {"tld": t, **_pricing_to_dict(p)} for t, p in pricing.items()
             ]
 
             return ToolResponse(
