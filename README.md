@@ -8,45 +8,184 @@
 
 MCP server for Porkbun domain-management workflows.
 
+**Version:** 0.1.3
+**Status:** Internal Bodai integration component
+
+## Quick Links
+
+- [Overview](#overview)
+- [Capabilities](#capabilities)
+- [Quick Start](#quick-start)
+- [MCP Server Configuration](#mcp-server-configuration)
+- [Tool Reference](#tool-reference)
+- [Configuration](#configuration)
+- [Development](#development)
+
+## Quality & CI
+
+Crackerjack is the standard quality-control and CI/CD gate for Porkbun Domain MCP changes. Local verification should mirror the Crackerjack workflow used across the Bodai ecosystem.
+
+______________________________________________________________________
+
 ## Overview
 
-This repository exposes domain-focused Porkbun operations through FastMCP, including lookup, renewal-oriented lifecycle actions, and domain metadata workflows. It is separate from the DNS server so domain operations and DNS record operations can evolve independently.
+Porkbun Domain MCP exposes domain-registration workflows through a FastMCP server. It is focused on account domain inventory, domain metadata, transfer authorization, renewal, and pricing operations while keeping provider credentials and request validation in a narrow integration boundary.
 
-## Installation
+This server is intentionally separate from `porkbun-dns-mcp`. Domain owns registration and lifecycle workflows; DNS owns record-level changes.
+
+## Capabilities
+
+Implemented tool surface:
+
+- **Domain inventory**: list all domains in the configured Porkbun account
+- **Domain details**: inspect status, TLD, registration date, expiration date, privacy, and auto-renew flags
+- **Transfer authorization**: retrieve EPP authorization codes
+- **Renewal workflow**: renew a domain for a selected number of years
+- **Pricing lookup**: retrieve registration, renewal, and transfer pricing by TLD
+- **Credential health metadata**: report whether API credentials are configured
+- **HTTP health routes**: `/health` and `/healthz` for MCP client and process supervision checks
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.13+
+- UV package manager
+- Porkbun API key and secret key
+
+### Local Setup
 
 ```bash
+git clone https://github.com/lesleslie/porkbun-domain-mcp.git
+cd porkbun-domain-mcp
 uv sync --group dev
 ```
 
-## Usage
-
-### Stdio Mode
+### Run With Credentials
 
 ```bash
-uv run porkbun-domain-mcp
+export PORKBUN_DOMAIN_API_KEY="your-api-key"
+export PORKBUN_DOMAIN_SECRET_KEY="your-secret-key"
+uv run porkbun-domain-mcp start
+uv run porkbun-domain-mcp health
 ```
 
-### HTTP Mode
+The default HTTP bind is `127.0.0.1:3043`.
+
+## CLI Commands
+
+The CLI is built with `mcp-common` and provides the standard lifecycle command surface used by Bodai MCP servers.
 
 ```bash
-uv run porkbun-domain-mcp serve --http --port 3043
+uv run porkbun-domain-mcp start      # Start the HTTP MCP server
+uv run porkbun-domain-mcp stop       # Stop the managed server process
+uv run porkbun-domain-mcp restart    # Restart the managed server process
+uv run porkbun-domain-mcp status     # Show process status
+uv run porkbun-domain-mcp health     # Run the local health probe
+```
+
+## MCP Server Configuration
+
+### Claude / Codex Style Configuration
+
+Add the server to an MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "porkbun-domain": {
+      "command": "uv",
+      "args": ["run", "porkbun-domain-mcp", "start"],
+      "cwd": "/Users/les/Projects/porkbun-domain-mcp",
+      "env": {
+        "PORKBUN_DOMAIN_API_KEY": "your-api-key",
+        "PORKBUN_DOMAIN_SECRET_KEY": "your-secret-key"
+      }
+    }
+  }
+}
+```
+
+Use your secret manager for live credentials rather than committing them to client config.
+
+### Health Checks
+
+```bash
+curl http://127.0.0.1:3043/health
+curl http://127.0.0.1:3043/healthz
+```
+
+## Tool Reference
+
+| Tool | Purpose | Required Inputs |
+|------|---------|-----------------|
+| `list_domains` | List domains in the Porkbun account | none |
+| `get_domain_info` | Retrieve domain metadata | `domain` |
+| `get_auth_code` | Retrieve transfer authorization code | `domain` |
+| `renew_domain` | Renew a domain registration | `domain` |
+| `get_pricing` | Retrieve TLD pricing | none |
+
+Tool responses follow a consistent `ToolResponse` shape:
+
+```json
+{
+  "success": true,
+  "message": "Found 12 domains in your account",
+  "data": {},
+  "error": null,
+  "next_steps": []
+}
+```
+
+## Configuration
+
+Committed defaults live in `settings/porkbun-domain.yaml`. Runtime overrides should come from environment variables or a local `.env` file that is not committed.
+
+| Setting | Environment Variable | Default |
+|---------|----------------------|---------|
+| API key | `PORKBUN_DOMAIN_API_KEY` | empty |
+| Secret key | `PORKBUN_DOMAIN_SECRET_KEY` | empty |
+| Base URL | `PORKBUN_DOMAIN_BASE_URL` | `https://porkbun.com/api/json/v3` |
+| Timeout | `PORKBUN_DOMAIN_TIMEOUT` | `30.0` |
+| Max retries | `PORKBUN_DOMAIN_MAX_RETRIES` | `3` |
+| HTTP host | `PORKBUN_DOMAIN_HTTP_HOST` | `127.0.0.1` |
+| HTTP port | `PORKBUN_DOMAIN_HTTP_PORT` | `3043` |
+| Log level | `PORKBUN_DOMAIN_LOG_LEVEL` | `INFO` |
+| JSON logs | `PORKBUN_DOMAIN_LOG_JSON` | `true` |
+
+## Project Structure
+
+```text
+porkbun_domain_mcp/
+  cli.py                 # mcp-common lifecycle CLI
+  client.py              # Porkbun domain API client boundary
+  config.py              # Pydantic settings and logging
+  models.py              # Typed domain and pricing models
+  server.py              # FastMCP application factory
+  tools/domain_tools.py  # Registered MCP tools
+settings/
+  porkbun-domain.yaml    # Committed defaults
+tests/
 ```
 
 ## Development
 
 ```bash
+uv sync --group dev
 uv run pytest
 uv run ruff check porkbun_domain_mcp tests
 uv run ruff format porkbun_domain_mcp tests
 ```
 
-## Project Structure
+Use targeted tests when isolating domain workflows:
 
-- `porkbun_domain_mcp/`: server package, provider client, tools, and schemas
-- `tests/`: domain workflow and provider error handling coverage
-- `docs/`: operational notes and examples
+```bash
+uv run pytest tests -k domain -v
+```
 
 ## Security Notes
 
-- Never commit Porkbun credentials or billing-sensitive information.
+- Do not commit Porkbun API keys, secret keys, billing-sensitive information, transfer authorization codes, or real account exports.
+- Treat `get_auth_code` and `renew_domain` as privileged tools.
+- Review generated transfer and renewal calls before exposing them to unattended agent workflows.
 - Scrub real domain details from fixtures, screenshots, and troubleshooting logs.

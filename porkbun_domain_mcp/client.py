@@ -8,7 +8,7 @@ API Documentation: https://porkbun.com/api/json/v3/documentation
 from __future__ import annotations
 
 import asyncio
-from typing import Any
+from typing import Any, cast
 
 import httpx
 
@@ -110,7 +110,7 @@ class PorkbunDomainClient:
                     endpoint=endpoint,
                     attempt=attempt + 1,
                 )
-                return data
+                return cast(dict[str, Any], data)
 
             except httpx.HTTPStatusError as e:
                 last_error = e
