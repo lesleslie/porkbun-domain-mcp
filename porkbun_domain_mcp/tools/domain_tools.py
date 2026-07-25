@@ -21,7 +21,7 @@ from porkbun_domain_mcp.config import get_logger_instance
 from porkbun_domain_mcp.models import Domain, PricingInfo
 
 if TYPE_CHECKING:
-    from fastmcp import FastMCP
+    from mcp_common.fastmcp import FastMCP
 
 logger = get_logger_instance("porkbun-domain-mcp.tools")
 
