@@ -18,6 +18,9 @@ dependencies = [
     "uvicorn>=0.30.0",
 ]
 
+[tool.uv.sources]
+mcp-common = { path = "../mcp-common", editable = true }
+
 [project.scripts]
 porkbun-domain-mcp = "porkbun_domain_mcp.cli:main"
 
