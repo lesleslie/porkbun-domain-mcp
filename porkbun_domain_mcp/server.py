@@ -85,7 +85,7 @@ def create_app() -> FastMCP:
                 logger.info("Porkbun domain client closed")
 
     app._mcp_server.lifespan = lifespan
-    app._porkbun_client = client  # type: ignore[attr-defined]
+    app._porkbun_client = client  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
     logger.info("Porkbun Domain MCP server initialized")
     return app

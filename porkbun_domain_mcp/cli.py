@@ -64,7 +64,7 @@ def health_probe_handler() -> RuntimeHealthSnapshot:
 
 factory = MCPServerCLIFactory(
     server_name="porkbun-domain-mcp",
-    settings=PorkbunDomainSettings(),
+    settings=None,  # Auto-load via MCPServerSettings.load(server_name)
     start_handler=start_server_handler,
     health_probe_handler=health_probe_handler,
 )
