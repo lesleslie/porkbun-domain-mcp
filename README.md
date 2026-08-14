@@ -8,7 +8,7 @@
 
 MCP server for Porkbun domain-management workflows.
 
-**Version:** 0.1.3
+**Version:** 0.2.0
 **Status:** Internal Bodai integration component
 
 ## Quick Links
@@ -31,7 +31,7 @@ ______________________________________________________________________
 
 Porkbun Domain MCP exposes domain-registration workflows through a FastMCP server. It is focused on account domain inventory, domain metadata, transfer authorization, renewal, and pricing operations while keeping provider credentials and request validation in a narrow integration boundary.
 
-This server is intentionally separate from `porkbun-dns-mcp`. Domain owns registration and lifecycle workflows; DNS owns record-level changes.
+This server focuses on registration and lifecycle workflows (inventory, metadata, transfer authorization, renewal, pricing). Record-level DNS changes are out of scope.
 
 ## Capabilities
 
@@ -78,11 +78,13 @@ The CLI is built with `mcp-common` and provides the standard lifecycle command s
 
 ```bash
 uv run porkbun-domain-mcp start      # Start the HTTP MCP server
-uv run porkbun-domain-mcp stop       # Stop the managed server process
-uv run porkbun-domain-mcp restart    # Restart the managed server process
-uv run porkbun-domain-mcp status     # Show process status
+uv run porkbun-domain-mcp stop       # Stop the managed server process (requires pid_file wiring)
+uv run porkbun-domain-mcp restart    # Restart the managed server process (requires pid_file wiring)
+uv run porkbun-domain-mcp status     # Show process status (requires pid_file wiring)
 uv run porkbun-domain-mcp health     # Run the local health probe
 ```
+
+> **Note (0.2.0):** `stop`, `restart`, and `status` rely on `mcp-common`'s `MCPServerCLIFactory` lifecycle, which requires `pid_file` and `log_file` to be configured on the lifecycle settings class. The current `porkbun_domain_mcp.cli.PorkbunDomainSettings` does not define either field, so these commands may report "not configured" at runtime. `start` and `health` work without the lifecycle wiring.
 
 ## MCP Server Configuration
 
@@ -153,6 +155,11 @@ Committed defaults live in `settings/porkbun-domain.yaml`. Runtime overrides sho
 | Log level | `PORKBUN_DOMAIN_LOG_LEVEL` | `INFO` |
 | JSON logs | `PORKBUN_DOMAIN_LOG_JSON` | `true` |
 
+> **Notes (0.2.0):**
+>
+> - The `porkbun_domain_mcp.config.PorkbunDomainSettings` model is configured with `env_prefix="PORKBUN_DOMAIN_"` and uses field names such as `log_json`, `log_level`, `http_host`, `timeout`, and `max_retries`. With pydantic-settings defaults, environment-variable names above match the model binding **only when the field has a single-word name** (e.g. `api_key` → `PORKBUN_DOMAIN_API_KEY`). Some env vars listed above may not bind without explicit aliases on the corresponding `Field(...)` declarations. Treat the table as the intent; if an override does not take effect, set the value in `settings/local.yaml` (gitignored) instead.
+> - `PORKBUN_DOMAIN_HTTP_HOST` is loaded by `PorkbunDomainSettings` but is **not yet consumed** by the `start` command — `porkbun_domain_mcp.cli.start_server_handler` currently hardcodes `host="127.0.0.1"` when launching `uvicorn`. Override the bind address in `settings/local.yaml` (via `http_host`) and re-check the `start` command in a follow-up release.
+
 ## Project Structure
 
 ```text
@@ -182,6 +189,8 @@ Use targeted tests when isolating domain workflows:
 ```bash
 uv run pytest tests -k domain -v
 ```
+
+> **Note (0.2.0):** The `tests/` directory exists at the repo root but is currently empty — there are no test files yet, so the `uv run pytest` invocations above are placeholders for the incoming test suite. The 0.2.0 release dropped `--cov-fail-under` for exactly this reason. Run `uv run pytest --collect-only` to confirm the empty collection before treating a green test run as coverage evidence.
 
 ## Security Notes
 
