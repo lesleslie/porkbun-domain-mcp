@@ -10,6 +10,8 @@ Modules:
     server: FastMCP server implementation
 """
 
+from importlib.metadata import version as _importlib_version
+
 from porkbun_domain_mcp.client import PorkbunDomainClient
 from porkbun_domain_mcp.config import PorkbunDomainSettings, get_settings, setup_logging
 from porkbun_domain_mcp.models import (
@@ -21,7 +23,7 @@ from porkbun_domain_mcp.models import (
     RenewalResult,
 )
 
-__version__ = "0.1.1"
+__version__ = _importlib_version("porkbun-domain-mcp")
 
 __all__ = [
     "PorkbunDomainClient",
