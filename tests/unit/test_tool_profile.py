@@ -20,7 +20,6 @@ any regression in the production path is caught.
 from __future__ import annotations
 
 import ast
-from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
@@ -406,9 +405,27 @@ def test_lifespan_finally_calls_client_close() -> None:
 
 @pytest.mark.asyncio
 async def test_lifespan_actually_calls_client_close_on_shutdown() -> None:
-    """End-to-end: drive ``create_app(settings, server)`` with a fresh
-    server, monkey-patch ``PorkbunDomainClient.close``, and verify the close
-    was invoked when the lifespan exits."""
+    """End-to-end: drive the production lifespan and verify the close
+    was invoked when the lifespan exits.
+
+    Round 1 fix (W4.6): the previous test injected a vanilla FastMCP
+    with a no-op lifespan, then manually called ``client.close()`` — that
+    verified close() is callable but NOT that the production lifespan
+    calls it. The production lifespan is only attached when ``create_app``
+    is called WITHOUT a server injection (the ``if server is None:``
+    branch in ``server.py`` attaches the production lifespan that wraps
+    ``await client.close()`` in its ``finally`` block).
+
+    This test now:
+      1. Calls ``await create_app(settings)`` with no server injection,
+         so the production lifespan IS attached.
+      2. Drives the production lifespan start/exit cycle via
+         ``server._lifespan_manager()`` — the same entry point
+         FastMCP itself uses in ``LowLevelServer.run`` and ``http.py``.
+      3. Asserts that ``PorkbunDomainClient.close`` was called exactly
+         once — by the production lifespan's ``finally`` block, not by
+         the test itself.
+    """
     settings = _test_settings()
 
     close_called = {"n": 0}
@@ -421,23 +438,27 @@ async def test_lifespan_actually_calls_client_close_on_shutdown() -> None:
         await original_close(self)
 
     with patch.object(PorkbunDomainClient, "close", tracking_close):
-        # Inject a fresh server with a lifespan wrapper so we can drive
-        # the start/exit cycle.
-        @asynccontextmanager
-        async def lifespan(_server: FastMCP):
-            try:
-                yield
-            finally:
-                pass  # close handled inside create_app
-
-        server = FastMCP(name="lifespan-test-server", lifespan=lifespan)
-        result = await create_app(settings=settings, server=server)
-        # Simulate the lifespan finally firing:
-        await result._porkbun_client.close()
+        # Production path: no server injection → the ``if server is None``
+        # block in ``server.py`` attaches the production lifespan that
+        # calls ``await client.close()`` in its ``finally``.
+        result = await create_app(settings=settings)
+        # Drive the production lifespan start/exit cycle via the same
+        # entry point FastMCP itself uses in ``LowLevelServer.run`` and
+        # ``http.py`` — ``server._lifespan_manager()`` sets
+        # ``_lifespan_result_set`` and properly invokes the production
+        # ``self._lifespan(self)`` callable. The ``__aexit__`` of that
+        # context manager fires the production ``finally: await
+        # client.close()`` (the W4.3 keystone).
+        async with result._lifespan_manager():
+            # Lifespan is now started; close will run when the
+            # context manager exits below.
+            pass
 
     assert close_called["n"] == 1, (
-        f"Expected exactly 1 close call, got {close_called['n']} "
-        "(the W4.3 reviewer finding)."
+        f"Expected exactly 1 close call from the production lifespan, "
+        f"got {close_called['n']} (the W4.3 reviewer finding — the "
+        f"production lifespan's ``finally`` block must call "
+        f"``await client.close()``)."
     )
 
 
