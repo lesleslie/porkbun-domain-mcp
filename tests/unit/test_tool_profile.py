@@ -30,7 +30,7 @@ from mcp_common.tools.dispatch import ALL_TOOLS, InvalidProfileError
 
 from porkbun_domain_mcp import tools as tools_pkg
 from porkbun_domain_mcp.config import PorkbunDomainSettings
-from porkbun_domain_mcp.server import create_app
+from porkbun_domain_mcp.server import create_app, create_app_sync
 from porkbun_domain_mcp.tools.profiles import (
     _GROUP_REGISTRY,
     FULL_REGISTRATIONS,
@@ -206,17 +206,37 @@ def test_server_awaits_apply_porkbun_domain_tool_profile() -> None:
 
 
 def test_server_does_not_call_sync_apply_tool_profile() -> None:
-    """``server.py`` MUST NOT call the sync ``apply_tool_profile`` wrapper."""
+    """``server.py`` MUST NOT call the sync ``apply_tool_profile`` wrapper.
+
+    AST walk guards against comments and substrings: a comment like
+    ``# don't use apply_tool_profile()`` would false-positive a substring
+    test but does NOT register as an AST ``Call`` node (the W4.6
+    reviewer finding — the prior implementation used
+    ``source.replace(...)`` and substring containment which is fragile
+    to comments).
+    """
     from pathlib import Path
 
     server_path = (
         Path(__file__).resolve().parents[2] / "porkbun_domain_mcp" / "server.py"
     )
-    source = server_path.read_text()
-    # Strip the async helper call (which always contains the substring)
-    # then ensure no OTHER call to apply_tool_profile exists.
-    stripped = source.replace("_apply_tool_profile", "")
-    assert "apply_tool_profile(" not in stripped, (
+    tree = ast.parse(server_path.read_text())
+
+    def _walk(node: ast.AST) -> bool:
+        if isinstance(node, ast.Call):
+            func = node.func
+            # Match direct call: apply_tool_profile(...)
+            if isinstance(func, ast.Name) and func.id == "apply_tool_profile":
+                return True
+            # Match attribute call: foo.apply_tool_profile(...)
+            if isinstance(func, ast.Attribute) and func.attr == "apply_tool_profile":
+                return True
+        for child in ast.iter_child_nodes(node):
+            if _walk(child):
+                return True
+        return False
+
+    assert not _walk(tree), (
         "server.py must not call sync apply_tool_profile (use "
         "_apply_tool_profile via apply_porkbun_domain_tool_profile)."
     )
@@ -601,3 +621,26 @@ async def test_create_app_invalid_profile_raises() -> None:
             await apply_porkbun_domain_tool_profile(
                 server, settings, client=object()  # type: ignore[arg-type]
             )
+
+
+# ---------------------------------------------------------------------------
+# W4.6 round-2 — sync wrapper ``create_app_sync`` end-to-end
+# ---------------------------------------------------------------------------
+
+
+def test_create_app_sync_returns_valid_server_from_sync_context() -> None:
+    """``create_app_sync`` (the sync wrapper around ``create_app``) must
+    return a valid ``FastMCP`` when called from a sync context with no
+    loop running (the CLI startup / ``__getattr__`` path).
+
+    This drives ``_run_async_safely`` via its ``asyncio.run`` branch —
+    the same code path that production CLI invocations exercise. The
+    ``ThreadPoolExecutor`` fallback (pytest-asyncio with a running loop)
+    is exercised by ``test_lifespan_actually_calls_client_close_on_shutdown``
+    which calls ``await create_app(...)`` directly inside an async test.
+    """
+    settings = _test_settings()
+    server = _fresh_server()
+    result = create_app_sync(settings=settings, server=server)
+    assert isinstance(result, FastMCP)
+    assert result.name == "test-server"

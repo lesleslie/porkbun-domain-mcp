@@ -11,7 +11,6 @@ from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any
 
 from fastmcp import FastMCP
-from mcp_common.health import register_http_health_route
 
 from porkbun_domain_mcp import __version__
 from porkbun_domain_mcp.client import PorkbunDomainClient
@@ -148,17 +147,6 @@ async def create_app(
     # block closes the same instance the tools use (the W4.3 reviewer
     # fix).
     await apply_porkbun_domain_tool_profile(server, settings, client)
-
-    # HTTP health endpoint (always at the module level — independent of
-    # the W0 tool profile dispatch). Mounted AFTER the profile dispatch
-    # so the ``/health`` route is independent of MCP tool visibility.
-    # The MCP ``health_check`` tool is registered inside
-    # ``register_health_tool`` (the MINIMAL group).
-    register_http_health_route(
-        server,
-        service_name="porkbun-domain",
-        version=APP_VERSION,
-    )
 
     # Stash the client on the FastMCP instance for tool access; FastMCP's
     # generic type doesn't model this dynamic attribute. Same as

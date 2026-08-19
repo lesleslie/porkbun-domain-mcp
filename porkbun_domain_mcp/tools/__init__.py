@@ -34,13 +34,6 @@ from porkbun_domain_mcp.client import PorkbunDomainClient
 from porkbun_domain_mcp.config import PorkbunDomainSettings
 from porkbun_domain_mcp.tools.domain_tools import register_domain_tools
 
-# Sentinel used to satisfy the uniform ``(mcp, settings, client)``
-# signature across every group function in ``_GROUP_REGISTRY``. The
-# health probe doesn't touch the Porkbun client — the third positional
-# arg is accepted purely so the W0 dispatch lambdas can invoke every
-# group fn with the same call shape.
-_UNUSED: Any = None
-
 
 def register_health_tool(
     mcp: FastMCP,
@@ -85,8 +78,6 @@ def register_health_tool(
             "configured": settings.has_credentials(),
         }
 
-    _ = _UNUSED  # silence unused-name lint; sentinel exists for signature uniformity
-
     register_http_health_route(
         mcp,
         service_name="porkbun-domain",
@@ -108,7 +99,9 @@ def register_domain_tools_for_profile(
     """Profile-dispatch entry for the domain_tools group.
 
     Forwards to the legacy ``register_domain_tools`` (which takes a
-    pre-constructed ``PorkbunDomainClient``).
+    pre-constructed ``PorkbunDomainClient``). The ``settings`` parameter
+    is kept for W0 dispatch signature uniformity; not forwarded to
+    the legacy register fn.
     """
     register_domain_tools(mcp, client)
 
