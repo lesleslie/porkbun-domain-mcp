@@ -81,6 +81,24 @@ creosote
 
 <!-- CRACKERJACK_START -->
 
+## Tool Profile System
+
+This server adopts the mcp-common 0.18.0 tool profile dispatcher. The
+default profile is `FULL` (all 5 tools + `health_check` + `discover_tools`).
+Set `PORKBUN_DOMAIN_TOOL_PROFILE=minimal` to expose only `health_check` +
+`discover_tools` (useful for control-plane / health-probe deployments
+where the Porkbun-bound tools would fail without credentials). Bogus
+env values raise `InvalidProfileError` at startup.
+
+The production path is **async** — `create_app()` awaits the W0 helper
+directly. The sync `apply_tool_profile()` wrapper from mcp-common raises
+`RuntimeError` in event loops, so the async path is the only correct
+entry point for any async caller. Tests cover this with an AST guard
+(`test_server_awaits_apply_porkbun_domain_tool_profile`) that would fail
+if `await` is removed.
+
+See `docs/architecture/tool-profile-rationale.md` for the full design.
+
 ## Crackerjack Integration
 
 This project is integrated with Crackerjack for automated quality assurance:
