@@ -85,7 +85,7 @@ once when the lifespan exits (the W4.3 reviewer finding in `neo4j-mcp`).
 - `porkbun_domain_mcp/tools/profiles.py` — new dispatch layer
   (`_GROUP_REGISTRY` + `PROFILE_REGISTRATIONS` + `_build_registration_map`
   + `register_all_tool_groups` + `apply_porkbun_domain_tool_profile`)
-- `tests/unit/test_tool_profile.py` — 21 tests covering the W4 contract
+- `tests/unit/test_tool_profile.py` — 32 tests covering the W4 contract
 - `CHANGELOG.md` + `CLAUDE.md` — note the new profile system
 
 ## Configuration

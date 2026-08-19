@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   finding)
 - New `porkbun_domain_mcp/tools/profiles.py` (3-tier registration map +
   `_GROUP_REGISTRY` constant + bulk register fn)
-- 21 new tests in `tests/unit/test_tool_profile.py` covering the W4
+- 32 new tests in `tests/unit/test_tool_profile.py` covering the W4
   contract (MINIMAL=health, async dispatch, caller-supplied settings,
   lifespan cleanup, AST guards that fail when `await` is removed)
 
