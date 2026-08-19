@@ -14,11 +14,14 @@ Configuration loading order (later overrides earlier):
 from __future__ import annotations
 
 from functools import lru_cache
+from importlib.metadata import version as _importlib_version
 from typing import Any
 
 import httpx
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_PACKAGE_VERSION = _importlib_version("porkbun-domain-mcp")
 
 # Oneiric logging imports
 try:
@@ -148,7 +151,7 @@ class PorkbunDomainSettings(BaseSettings):
             "headers": {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "User-Agent": "porkbun-domain-mcp/0.1.1",
+                "User-Agent": f"porkbun-domain-mcp/{_PACKAGE_VERSION}",
             },
         }
 

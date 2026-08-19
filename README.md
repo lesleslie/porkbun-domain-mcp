@@ -8,7 +8,7 @@
 
 MCP server for Porkbun domain-management workflows.
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 **Status:** Internal Bodai integration component
 
 ## Quick Links
@@ -157,8 +157,8 @@ Committed defaults live in `settings/porkbun-domain.yaml`. Runtime overrides sho
 
 > **Notes (0.2.0):**
 >
-> - The `porkbun_domain_mcp.config.PorkbunDomainSettings` model is configured with `env_prefix="PORKBUN_DOMAIN_"` and uses field names such as `log_json`, `log_level`, `http_host`, `timeout`, and `max_retries`. With pydantic-settings defaults, environment-variable names above match the model binding **only when the field has a single-word name** (e.g. `api_key` → `PORKBUN_DOMAIN_API_KEY`). Some env vars listed above may not bind without explicit aliases on the corresponding `Field(...)` declarations. Treat the table as the intent; if an override does not take effect, set the value in `settings/local.yaml` (gitignored) instead.
-> - `PORKBUN_DOMAIN_HTTP_HOST` is loaded by `PorkbunDomainSettings` but is **not yet consumed** by the `start` command — `porkbun_domain_mcp.cli.start_server_handler` currently hardcodes `host="127.0.0.1"` when launching `uvicorn`. Override the bind address in `settings/local.yaml` (via `http_host`) and re-check the `start` command in a follow-up release.
+> - The `porkbun_domain_mcp.config.PorkbunDomainSettings` model is configured with `env_prefix="PORKBUN_DOMAIN_"` and uses field names such as `log_json`, `log_level`, `http_host`, `timeout`, and `max_retries`. With pydantic-settings defaults, all 9 single-word env vars above bind via the standard `UPPER_SNAKE_CASE` derivation (e.g. `api_key` → `PORKBUN_DOMAIN_API_KEY`). Multi-word fields like `log_json`, `log_level`, and `http_host` use the literal `PORKBUN_DOMAIN_LOG_JSON`, `PORKBUN_DOMAIN_LOG_LEVEL`, and `PORKBUN_DOMAIN_HTTP_HOST` names listed in the table.
+> - `PORKBUN_DOMAIN_HTTP_HOST` is now read by `porkbun_domain_mcp.cli.start_server_handler` and passed to `uvicorn.run(host=...)`. Override the bind address via `PORKBUN_DOMAIN_HTTP_HOST` or `settings/local.yaml` (gitignored).
 
 ## Project Structure
 
@@ -190,7 +190,7 @@ Use targeted tests when isolating domain workflows:
 uv run pytest tests -k domain -v
 ```
 
-> **Note (0.2.0):** The `tests/` directory exists at the repo root but is currently empty — there are no test files yet, so the `uv run pytest` invocations above are placeholders for the incoming test suite. The 0.2.0 release dropped `--cov-fail-under` for exactly this reason. Run `uv run pytest --collect-only` to confirm the empty collection before treating a green test run as coverage evidence.
+> **Note (0.2.1):** `tests/` contains 32 tests in `tests/unit/test_tool_profile.py` plus a `tests/test_version_sync.py` guard for the package User-Agent / version stamp. The 0.2.0 release dropped `--cov-fail-under` while the test suite was being filled in; restore a coverage floor once the suite stabilizes.
 
 ## Security Notes
 
