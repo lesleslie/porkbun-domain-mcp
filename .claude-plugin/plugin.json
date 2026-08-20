@@ -1,0 +1,17 @@
+{
+  "author": {
+    "name": "Bodai"
+  },
+  "description": "Bodai plugin for the porkbun-domain-mcp domain management server.",
+  "keywords": [
+    "bodai",
+    "mcp",
+    "porkbun",
+    "domain",
+    "dns"
+  ],
+  "mcpServers": "./.mcp.json",
+  "name": "porkbun-domain",
+  "schema_version": "1.0.0",
+  "version": "0.1.0"
+}

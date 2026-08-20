@@ -25,6 +25,10 @@ MCP server for Porkbun domain-management workflows.
 
 Crackerjack is the standard quality-control and CI/CD gate for Porkbun Domain MCP changes. Local verification should mirror the Crackerjack workflow used across the Bodai ecosystem.
 
+## Installation via Bodai Marketplace
+
+This repository ships as a Bodai plugin. To install it through the marketplace, add the local `bodai-plugins` marketplace, then install `porkbun-domain` from it. The plugin manifest is `.claude-plugin/plugin.json` and the colocated `.mcp.json` points at the local HTTP server on port `3043`. Once installed, the slash commands (`/porkbun-domain-list`, `/porkbun-domain-pricing`, `/porkbun-domain-register`) wrap the highest-frequency workflows and are available alongside the raw `mcp__porkbun-domain__*` tools. The server key is `porkbun-domain` (short form) — the directory keeps the long-form `porkbun-domain-mcp` name, but the manifest name, server key, and command namespace all share the short form per the bodai "one string, three places" rule.
+
 ______________________________________________________________________
 
 ## Overview
