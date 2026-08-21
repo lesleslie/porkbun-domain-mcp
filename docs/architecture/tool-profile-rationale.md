@@ -7,20 +7,20 @@ Tier-A repos in the W4 wave; the first five were `css-mcp`,
 
 ## Tier-A trivial profile mapping
 
-| Profile   | Tools exposed                                                                                                                |
+| Profile | Tools exposed |
 |-----------|------------------------------------------------------------------------------------------------------------------------------|
-| `MINIMAL`  | `health_check` (MCP) + `discover_tools` (W0 meta). HTTP `/health` + `/healthz` routes always available.                        |
-| `STANDARD` | All 5 `porkbun-domain-mcp` tools + `health_check` + `discover_tools` (same as FULL — Tier-A trivial).                        |
-| `FULL`     | All 5 `porkbun-domain-mcp` tools + `health_check` + `discover_tools`. Default behavior when no env var is set.               |
+| `MINIMAL` | `health_check` (MCP) + `discover_tools` (W0 meta). HTTP `/health` + `/healthz` routes always available. |
+| `STANDARD` | All 5 `porkbun-domain-mcp` tools + `health_check` + `discover_tools` (same as FULL — Tier-A trivial). |
+| `FULL` | All 5 `porkbun-domain-mcp` tools + `health_check` + `discover_tools`. Default behavior when no env var is set. |
 
 The 5 Porkbun tools (Tier-A trivial — no "core subset" to drop at
 STANDARD):
 
 1. `list_domains` (domain_tools group)
-2. `get_domain_info` (domain_tools group)
-3. `get_auth_code` (domain_tools group)
-4. `renew_domain` (domain_tools group)
-5. `get_pricing` (domain_tools group)
+1. `get_domain_info` (domain_tools group)
+1. `get_auth_code` (domain_tools group)
+1. `renew_domain` (domain_tools group)
+1. `get_pricing` (domain_tools group)
 
 ## Why MINIMAL = health-only
 
@@ -80,21 +80,21 @@ once when the lifespan exits (the W4.3 reviewer finding in `neo4j-mcp`).
 - `pyproject.toml` — bump `mcp-common>=0.17.0` → `>=0.18.0`
 - `porkbun_domain_mcp/server.py` — async `create_app()` + lifespan close
 - `porkbun_domain_mcp/tools/__init__.py` — split `register_health_tool`
-  + `register_domain_tools_for_profile` from the legacy
-  `register_domain_tools` shim
+  - `register_domain_tools_for_profile` from the legacy
+    `register_domain_tools` shim
 - `porkbun_domain_mcp/tools/profiles.py` — new dispatch layer
   (`_GROUP_REGISTRY` + `PROFILE_REGISTRATIONS` + `_build_registration_map`
-  + `register_all_tool_groups` + `apply_porkbun_domain_tool_profile`)
+  - `register_all_tool_groups` + `apply_porkbun_domain_tool_profile`)
 - `tests/unit/test_tool_profile.py` — 32 tests covering the W4 contract
 - `CHANGELOG.md` + `CLAUDE.md` — note the new profile system
 
 ## Configuration
 
-| Env var                          | Default | Effect                                                              |
+| Env var | Default | Effect |
 |----------------------------------|---------|---------------------------------------------------------------------|
-| `PORKBUN_DOMAIN_TOOL_PROFILE`    | `full`  | Set to `minimal` / `standard` / `full`. Bogus values raise loud.    |
-| `PORKBUN_DOMAIN_API_KEY`         | `""`    | Porkbun API key (required for non-health tools).                     |
-| `PORKBUN_DOMAIN_SECRET_KEY`      | `""`    | Porkbun secret API key (required for non-health tools).             |
+| `PORKBUN_DOMAIN_TOOL_PROFILE` | `full` | Set to `minimal` / `standard` / `full`. Bogus values raise loud. |
+| `PORKBUN_DOMAIN_API_KEY` | `""` | Porkbun API key (required for non-health tools). |
+| `PORKBUN_DOMAIN_SECRET_KEY` | `""` | Porkbun secret API key (required for non-health tools). |
 
 ## Cross-references
 

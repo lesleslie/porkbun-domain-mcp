@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-21
+
+### Added
+
+- porkbun-domain-mcp: Adopt apply_tool_profile() (W4.6)
+- porkbun-domain: Bodai plugin conversion (manifest, mcp.json, slash commands)
+
+### Changed
+
+- porkbun-domain-mcp: Fix W4.6 review Minors F2-F6
+
+### Fixed
+
+- porkbun-domain-mcp: Sort imports in test_doc_drift.py
+- porkbun-domain-mcp: Sync version stamps (2026-08-19)
+
+### Documentation
+
+- porkbun-domain-mcp: Fix documented-but-not-wired audit findings (2026-08-19)
+- porkbun-domain-mcp: Refresh stale test count (2026-08-19)
+
+### Testing
+
+- porkbun-domain-mcp: Add doc-drift CI guard (2026-08-19)
+- porkbun-domain-mcp: Drive production lifespan in W4.3 test (W4.6 round 1 fix)
+
+### Internal
+
+- gitignore: Untrack .pyscn/ (bodai 2026-08-20)
+- porkbun-domain-mcp: Bootstrap [tool.crackerjack] section + uv sync upgrade
+- porkbun-domain-mcp: Gitignore .lycheecache (file, not just dir)
+- porkbun-domain-mcp: Gitignore .lycheecache + .hypothesis
+- porkbun-domain-mcp: Refresh crackerjack + oneiric deps
+- porkbun-domain-mcp: Untrack .lycheecache + .hypothesis runtime artifacts
+
 ## [Unreleased]
 
 ### Added

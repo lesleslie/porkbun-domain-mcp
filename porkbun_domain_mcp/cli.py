@@ -32,7 +32,9 @@ class PorkbunDomainSettings(OneiricMCPConfig):
 def start_server_handler() -> None:
     """Start handler that launches the Porkbun Domain MCP server in HTTP mode."""
     settings = PorkbunDomainSettings()
-    print(f"Starting Porkbun Domain MCP server on {settings.http_host}:{settings.http_port}...")
+    print(
+        f"Starting Porkbun Domain MCP server on {settings.http_host}:{settings.http_port}..."
+    )
     uvicorn.run(
         "porkbun_domain_mcp.server:http_app",
         host=settings.http_host,
