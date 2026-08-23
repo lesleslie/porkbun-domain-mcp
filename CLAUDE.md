@@ -129,3 +129,11 @@ The project can use Crackerjack's AI agent skills via MCP:
 This project can be accessed via Crackerjack's MCP server for real-time quality monitoring and intelligent fix suggestions.
 
 <!-- CRACKERJACK_END -->
+
+## Oneiric action kits
+
+Before writing common primitives (HMAC, token gen, schema validation,
+retries, redaction, HTTP probing, serialization, compression, hashing,
+data transforms), check `oneiric.actions` — catalog lives at
+`oneiric/docs/action-kits.md` in the oneiric project. Discovery hint:
+`mahavishnu/.claude/decisions/promote-oneiric-action-kits.md`.
