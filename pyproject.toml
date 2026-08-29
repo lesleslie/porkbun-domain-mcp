@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "porkbun-domain-mcp"
-version = "0.4.0"
+version = "0.4.1"
 description = "Unofficial MCP server for Porkbun domain management"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -17,9 +17,6 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "uvicorn>=0.30.0",
 ]
-
-[tool.uv.sources]
-mcp-common = { path = "../mcp-common", editable = true }
 
 [project.scripts]
 porkbun-domain-mcp = "porkbun_domain_mcp.cli:main"
