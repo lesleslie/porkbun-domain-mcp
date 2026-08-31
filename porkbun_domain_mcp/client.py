@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 from typing import Any, cast
 
-import httpx
+import httpx2 as httpx
 
 from .config import PorkbunDomainSettings, get_logger_instance, get_settings
 from .models import (
