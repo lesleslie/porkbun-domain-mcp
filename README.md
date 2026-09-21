@@ -23,7 +23,7 @@ MCP server for Porkbun domain-management workflows.
 
 ## Quality & CI
 
-Crackerjack is the standard quality-control and CI/CD gate for Porkbun Domain MCP changes. Local verification should mirror the Crackerjack workflow used across the Bodai ecosystem.
+Crackerjack is the standard quality-control and CI/CD gate for Porkbun Domain MCP changes. Local verification should mirror the Crackerjack workflow.
 
 ## Installation via Claude Code marketplace
 
@@ -78,7 +78,7 @@ The default HTTP bind is `127.0.0.1:3043`.
 
 ## CLI Commands
 
-The CLI is built with `mcp-common` and provides the standard lifecycle command surface used by Bodai MCP servers.
+The CLI is built with `mcp-common` and provides a standard lifecycle command surface.
 
 ```bash
 uv run porkbun-domain-mcp start      # Start the HTTP MCP server
@@ -202,3 +202,7 @@ uv run pytest tests -k domain -v
 - Treat `get_auth_code` and `renew_domain` as privileged tools.
 - Review generated transfer and renewal calls before exposing them to unattended agent workflows.
 - Scrub real domain details from fixtures, screenshots, and troubleshooting logs.
+
+Built on [Oneiric](https://github.com/lesleslie/oneiric) for runtime configuration
+and [mcp-common](https://github.com/lesleslie/mcp-common) for the FastMCP
+baseline. [Crackerjack](https://github.com/lesleslie/crackerjack) gates every commit.
