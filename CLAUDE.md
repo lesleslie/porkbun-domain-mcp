@@ -149,6 +149,7 @@ End-to-end smoke tests in CI must spin up the server and assert non-empty
 responses per tool. Monthly cross-repo audit cadence.
 
 When adding any new MCP tool to this repo:
+
 - [ ] Tool registration includes `tests/integration/test_<tool>_e2e.py`.
 - [ ] Data feed exposes the four mandatory metrics.
 - [ ] `/health` aggregator includes this feed's state.

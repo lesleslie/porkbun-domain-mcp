@@ -118,15 +118,6 @@ async def create_app(
 
         server = FastMCP(name=APP_NAME, version=APP_VERSION, lifespan=lifespan)
 
-        # Kubernetes-style health check endpoint (always at the module
-        # level — independent of the W0 tool profile dispatch).
-        @server.custom_route("/healthz", methods=["GET"])
-        async def healthz_check(request: Any) -> Any:
-            """Kubernetes-style health check endpoint."""
-            from starlette.responses import JSONResponse
-
-            return JSONResponse({"status": "ok"})
-
     # Apply tool profile dispatch (PORKBUN_DOMAIN_TOOL_PROFILE env var).
     #
     # Replaces the previous direct ``register_domain_tools(app, client)``
